@@ -23,52 +23,51 @@ module TreeStuff =
         | Add s -> state
         | Remove s -> state
     
-    let private storyInfoTemplate (entry: StoryInfo) (dispatch: Msg -> unit) =
-        Grid.create [
-            Grid.showGridLines false
-            Grid.columnDefinitions "Auto, 5*, Auto, 3*"
-            Grid.children [
-                TextBlock.create [
-                    Grid.column 0
-                    TextBlock.padding (0.0, 0.0, 5.0, 0.0)
-                    TextBlock.text "Name: "
-                ]
-                TextBlock.create [
-                    Grid.column 1
-                    TextBlock.text entry.Name
-                ]
-                TextBlock.create [
-                    Grid.column 2
-                    TextBlock.padding (0.0, 0.0, 5.0, 0.0)
-                    TextBlock.text "Date: "
-                ]
-                TextBlock.create [
-                    Grid.column 3
-                    TextBlock.text (entry.Date.ToString "yyyy-MM-dd")
-                ]
-            ]
-        ]
+    // let private createChapterInfo (entry: StoryInfo) =
+    //     Grid.create [
+    //         Grid.showGridLines false
+    //         Grid.columnDefinitions "Auto, 5*, Auto, 3*"
+    //         Grid.children [
+    //             TextBlock.create [
+    //                 Grid.column 0
+    //                 TextBlock.padding (0.0, 0.0, 5.0, 0.0)
+    //                 TextBlock.text "Name: "
+    //             ]
+    //             TextBlock.create [
+    //                 Grid.column 1
+    //                 TextBlock.text entry.Name
+    //             ]
+    //             TextBlock.create [
+    //                 Grid.column 2
+    //                 TextBlock.padding (0.0, 0.0, 5.0, 0.0)
+    //                 TextBlock.text "Date: "
+    //             ]
+    //             TextBlock.create [
+    //                 Grid.column 3
+    //                 TextBlock.text (entry.Date.ToString "yyyy-MM-dd")
+    //             ]
+    //         ]
+    //     ]
 
     let private getChildren (inf: StoryData) : StoryData seq =
         match inf with
-        | Author s -> Seq.empty // s.Books |> Seq.map Book
-        | Book b -> Seq.empty // b.Chapters |> Seq.map Chapter
+        | Author s -> s.Books |> Seq.map Book
+        | Book b -> b.Chapters |> Seq.map Chapter
         | Chapter _ -> Seq.empty
 
     let private createView (d: StoryData) =
         match d with 
-        | Author s -> TextBlock.create [ TextBlock.text s.Name]
-        | Book b -> TextBlock.create [ TextBlock.text b.Name]
-        | Chapter c -> TextBlock.create [ TextBlock.text c.Name]
+        | Author s -> TextBlock.create [ TextBlock.text s.Name]  // :> Avalonia.FuncUI.Types.IView
+        | Book b -> TextBlock.create [ TextBlock.text b.Name]    // :> Avalonia.FuncUI.Types.IView
+        | Chapter c -> TextBlock.create [ TextBlock.text c.Name] // createChapterInfo c :> Avalonia.FuncUI.Types.IView
 
 
     let view (state: State) (dispatch: Msg -> unit) =
         TreeView.create [
             TreeView.name "Author Stories"
             TreeView.dataItems state.Entries
-            TreeView.itemTemplate 
-                (DataTemplateView<StoryData>.create 
-                    ( (getChildren), 
-                      (createView) )
-                )
+            // TreeView.itemTemplate 
+            //     (DataTemplateView<StoryData>.create 
+            //         ( getChildren, createView )
+            //     )
         ]
