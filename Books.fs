@@ -6,6 +6,12 @@ module Books =
     type BookInfo = { Name: string; Chapters: StoryInfo list }
     type AuthorStoriesInfo = { Name: string; Books: BookInfo list }
 
+    // The following are sample story chapters/books from the Star Wars
+    // fan fiction site.  This allows me to specify different types at 
+    // different levels of nesting for purposes of playing with nested
+    // data.  If you are interested go to 
+    // https://www.fanfiction.net/movie/Star-Wars/.
+
     // Stories by Rook-385
     let private frontierChapters = [
         { Name = "Frontier - Chapter 1"; Date = System.DateTime(2020, 9, 30, 0, 0, 0) }
