@@ -55,7 +55,7 @@ module TreeStuff =
         | Book b -> b.Chapters |> Seq.map Chapter
         | Chapter _ -> Seq.empty
 
-    let private createView (d: StoryData) =
+    let private createView (dispatch: Msg -> unit) (d: StoryData) =
         match d with 
         | Author s -> TextBlock.create [ TextBlock.text s.Name]  // :> Avalonia.FuncUI.Types.IView
         | Book b -> TextBlock.create [ TextBlock.text b.Name]    // :> Avalonia.FuncUI.Types.IView
@@ -63,11 +63,16 @@ module TreeStuff =
 
 
     let view (state: State) (dispatch: Msg -> unit) =
-        TreeView.create [
-            TreeView.name "Author Stories"
-            TreeView.dataItems state.Entries
-            // TreeView.itemTemplate 
-            //     (DataTemplateView<StoryData>.create 
-            //         ( getChildren, createView )
-            //     )
+        DockPanel.create [
+            DockPanel.children [
+                yield TreeView.create [
+                    TreeView.dock Dock.Left
+                    TreeView.name "Author Stories"
+                    TreeView.dataItems state.Entries
+                    TreeView.itemTemplate 
+                        (DataTemplateView<StoryData>.create 
+                            ( getChildren, createView dispatch)
+                        )
+                ]
+            ]
         ]
