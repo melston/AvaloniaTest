@@ -7,20 +7,20 @@ module Table =
     open Avalonia.FuncUI.Components
     open Avalonia.Layout
     
-    type State = { Entries : StoryInfo list }
+    type State = { Entries : ChapterInfo list }
 
     let init = { Entries = Books.stories }
 
-    type Msg = Add of StoryInfo | Remove of string
+    type Msg = Add of ChapterInfo | Remove of string
 
     let update (msg: Msg) (state: State) : State =
         match msg with
         | Add s -> { state with Entries = s :: state.Entries }
         | Remove s -> { 
             state with Entries = state.Entries 
-                                 |> List.filter (fun v -> v.Name.Equals(s) |> not )}
+                                 |> List.filter (fun v -> v.ChapterName.Equals(s) |> not )}
     
-    let private storyInfo (entry: StoryInfo) (dispatch: Msg -> unit) =
+    let private storyInfo (entry: ChapterInfo) (dispatch: Msg -> unit) =
         Grid.create [
             Grid.showGridLines false
             Grid.columnDefinitions "Auto, 5*, Auto, 3*"
@@ -32,7 +32,7 @@ module Table =
                 ]
                 TextBlock.create [
                     Grid.column 1
-                    TextBlock.text entry.Name
+                    TextBlock.text entry.ChapterName
                 ]
                 TextBlock.create [
                     Grid.column 2
@@ -46,7 +46,7 @@ module Table =
             ]
         ]
 
-    let private entryTemplate (entry: StoryInfo) (dispatch: Msg -> unit) =
+    let private entryTemplate (entry: ChapterInfo) (dispatch: Msg -> unit) =
         Grid.create [
             Grid.showGridLines false
             Grid.columnDefinitions "Auto, 5*, Auto, 3*"
@@ -58,7 +58,7 @@ module Table =
                 ]
                 TextBlock.create [
                     Grid.column 1
-                    TextBlock.text entry.Name
+                    TextBlock.text entry.ChapterName
                 ]
                 TextBlock.create [
                     Grid.column 2
@@ -75,5 +75,5 @@ module Table =
     let view (state: State) (dispatch: Msg -> unit) =
         ListBox.create [
             ListBox.dataItems state.Entries
-            ListBox.itemTemplate (DataTemplateView<StoryInfo>.create(fun item -> entryTemplate item dispatch))
+            ListBox.itemTemplate (DataTemplateView<ChapterInfo>.create(fun item -> entryTemplate item dispatch))
         ]
