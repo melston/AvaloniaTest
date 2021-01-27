@@ -12,9 +12,9 @@ module TreeStuff =
         | Book of BookInfo
         | Chapter of StoryInfo
 
-    type State = { Entries : StoryData list }
+    type State = { Entries : StoryData seq }
 
-    let init = { Entries = (authStories |> List.map Author) }
+    let init = { Entries = (authStories |> Seq.map Author) }
 
     type Msg = Add of StoryInfo | Remove of string
 
@@ -67,7 +67,6 @@ module TreeStuff =
             DockPanel.children [
                 yield TreeView.create [
                     TreeView.dock Dock.Left
-                    TreeView.name "Author Stories"
                     TreeView.dataItems state.Entries
                     TreeView.itemTemplate 
                         (DataTemplateView<StoryData>.create 
