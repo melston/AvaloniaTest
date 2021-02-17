@@ -25,47 +25,54 @@ module TreeStuff =
         | Remove s -> state
     
     let private createAuthorView (entry: AuthorBooksInfo) =
+        // Authors are only shown with the author name
         TextBlock.create [ TextBlock.text entry.AuthorName ]
 
     let private createBookView (entry: BookInfo) =
+        // Books are currently only showing the book name.  More to come.
         TextBlock.create [ TextBlock.text entry.BookName ]
 
     let private createChapterView (entry: ChapterInfo) =
-        Grid.create [
-            Grid.showGridLines false
-            Grid.columnDefinitions "Auto, 5*, Auto, 3*"
-            Grid.children [
-                TextBlock.create [
-                    Grid.column 0
-                    TextBlock.padding (0.0, 0.0, 5.0, 0.0)
-                    TextBlock.text "Name: "
-                ]
-                TextBlock.create [
-                    Grid.column 1
-                    TextBlock.text entry.ChapterName
-                ]
-                TextBlock.create [
-                    Grid.column 2
-                    TextBlock.padding (0.0, 0.0, 5.0, 0.0)
-                    TextBlock.text "Date: "
-                ]
-                TextBlock.create [
-                    Grid.column 3
-                    TextBlock.text (entry.Date.ToString "yyyy-MM-dd")
-                ]
-            ]
-        ]
+        // Chapters are shown as:  | Name: | <chapter name> | Date: | <date added> |
+        // Grid.create [
+        //     Grid.showGridLines false
+        //     Grid.columnDefinitions "Auto, 5*, Auto, 3*"
+        //     Grid.children [
+        //         TextBlock.create [
+        //             Grid.column 0
+        //             TextBlock.padding (0.0, 0.0, 5.0, 0.0)
+        //             TextBlock.text "Name: "
+        //         ]
+        //         TextBlock.create [
+        //             Grid.column 1
+        //             TextBlock.text entry.ChapterName
+        //         ]
+        //         TextBlock.create [
+        //             Grid.column 2
+        //             TextBlock.padding (0.0, 0.0, 5.0, 0.0)
+        //             TextBlock.text "Date: "
+        //         ]
+        //         TextBlock.create [
+        //             Grid.column 3
+        //             TextBlock.text (entry.Date.ToString "yyyy-MM-dd")
+        //         ]
+        //     ]
+        // ]
+        TextBlock.create [ TextBlock.text entry.ChapterName ]
 
-    let private createView (dispatch: Msg -> unit) (d: StoryData) :Avalonia.FuncUI.Types.IView =
+    let private createView (dispatch: Msg -> unit) (d: StoryData) =
         // For now, just create a TextBlock with Author/Book/Chapter name
         // Later we will make it more complicated - e.g. createChapterInfo
         match d with 
-        | Author a  -> createAuthorView a  :> Avalonia.FuncUI.Types.IView
-        | Book b    -> createBookView b    :> Avalonia.FuncUI.Types.IView
-        | Chapter c -> createChapterView c :> Avalonia.FuncUI.Types.IView
+        | Author a  -> createAuthorView a
+        | Book b    -> createBookView b
+        | Chapter c -> createChapterView c
 
 
     let private getChildren (inf: StoryData) : StoryData seq =
+        // Authors have Book entries as children
+        // Books have Chapter entries as children
+        // Chapters have no children
         match inf with
         | Author s  -> s.Books |> Seq.map Book
         | Book b    -> b.Chapters |> Seq.map Chapter
