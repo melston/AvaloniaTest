@@ -24,72 +24,70 @@ module TreeStuff =
         | Add s -> state
         | Remove s -> state
     
-    let private createAuthorView (entry: AuthorBooksInfo) =
-        // Authors are only shown with the author name
-        TextBlock.create [ TextBlock.text entry.AuthorName ]
+    let private createChapterView (dispatch: Msg -> unit) (entry: ChapterInfo) =
+        let v = Grid.create [
+                    Grid.showGridLines false
+                    Grid.columnDefinitions "Auto, 3*, Auto, 2*"
+                    Grid.children [
+                        TextBlock.create [
+                            Grid.column 0
+                            TextBlock.padding (0.0, 0.0, 5.0, 0.0)
+                            TextBlock.text "Name: "
+                        ]
+                        TextBlock.create [
+                            Grid.column 1
+                            TextBlock.text entry.ChapterName
+                        ]
+                        TextBlock.create [
+                            Grid.column 2
+                            TextBlock.padding (0.0, 0.0, 5.0, 0.0)
+                            TextBlock.text "Date: "
+                        ]
+                        TextBlock.create [
+                            Grid.column 3
+                            TextBlock.text (entry.Date.ToString "yyyy-MM-dd")
+                        ]
+                    ]
+                ]
+        TreeViewItem.create [
+            // TreeViewItem.header entry.ChapterName
+            TreeViewItem.header v
+        ]
 
-    let private createBookView (entry: BookInfo) =
-        // Books are currently only showing the book name.  More to come.
-        TextBlock.create [ TextBlock.text entry.BookName ]
+    let private createBookView (dispatch: Msg -> unit) (entry: BookInfo) =
+        TreeViewItem.create [
+            TreeViewItem.header entry.BookName
+            TreeViewItem.viewItems [
+                for chapter in entry.Chapters do
+                    createChapterView dispatch chapter
+            ]
+        ]
 
-    let private createChapterView (entry: ChapterInfo) =
-        // Chapters are shown as:  | Name: | <chapter name> | Date: | <date added> |
-        // Grid.create [
-        //     Grid.showGridLines false
-        //     Grid.columnDefinitions "Auto, 5*, Auto, 3*"
-        //     Grid.children [
-        //         TextBlock.create [
-        //             Grid.column 0
-        //             TextBlock.padding (0.0, 0.0, 5.0, 0.0)
-        //             TextBlock.text "Name: "
-        //         ]
-        //         TextBlock.create [
-        //             Grid.column 1
-        //             TextBlock.text entry.ChapterName
-        //         ]
-        //         TextBlock.create [
-        //             Grid.column 2
-        //             TextBlock.padding (0.0, 0.0, 5.0, 0.0)
-        //             TextBlock.text "Date: "
-        //         ]
-        //         TextBlock.create [
-        //             Grid.column 3
-        //             TextBlock.text (entry.Date.ToString "yyyy-MM-dd")
-        //         ]
-        //     ]
-        // ]
-        TextBlock.create [ TextBlock.text entry.ChapterName ]
+    let private createAuthorView (dispatch: Msg -> unit) (entry: AuthorBooksInfo) =
+        TreeViewItem.create [
+            TreeViewItem.header entry.AuthorName
+            TreeViewItem.viewItems [
+                for book in entry.Books do
+                    createBookView dispatch book
+            ]
+        ]
 
     let private createView (dispatch: Msg -> unit) (d: StoryData) =
-        // For now, just create a TextBlock with Author/Book/Chapter name
-        // Later we will make it more complicated - e.g. createChapterInfo
         match d with 
-        | Author a  -> createAuthorView a
-        | Book b    -> createBookView b
-        | Chapter c -> createChapterView c
+        | Author a  -> createAuthorView dispatch a
+        | Book b    -> createBookView dispatch b
+        | Chapter c -> createChapterView dispatch c
 
-
-    let private getChildren (inf: StoryData) : StoryData seq =
-        // Authors have Book entries as children
-        // Books have Chapter entries as children
-        // Chapters have no children
-        match inf with
-        | Author s  -> s.Books |> Seq.map Book
-        | Book b    -> b.Chapters |> Seq.map Chapter
-        | Chapter c -> Seq.empty  // No children for chapters
 
     let view (state: State) (dispatch: Msg -> unit) =
         DockPanel.create [
             DockPanel.children [
                 yield TreeView.create [
                     TreeView.dock Dock.Left
-                    TreeView.dataItems state.Entries
-                    // If we comment this out we get a 'tree' of sorts but
-                    // it isn't very useful.
-                    TreeView.itemTemplate 
-                        (DataTemplateView<StoryData>.create 
-                            ( getChildren, createView dispatch )
-                        )
+                    TreeView.viewItems [
+                        for entity in state.Entries do
+                            createView dispatch entity
+                    ]
                 ]
             ]
         ]
